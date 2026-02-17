@@ -9,7 +9,7 @@
   transactions = Transaction.all
 %>
 
-<h1>Transactions</h1>
+<h2>Transactions - List Version</h2>
 <ul>
   <% for transaction in transactions %>
     <% to_user = User.find_by({ "id" => transaction["to_user_id"] }) %>
@@ -24,9 +24,33 @@
   <% end %>
 </ul>
 
+<h2>Transactions - Table Version</h2>
+
+  <table>
+    <tr>
+      <th>From User</th>
+      <th>To User</th>
+      <th>Amount</th>
+    </tr>
+  <% for transaction in transactions %>
+    <% to_user = User.find_by({ "id" => transaction["to_user_id"] }) %>
+    <tr>
+      <td>  <% if transaction["from_user_id"] == nil then %>
+              Intial coin offering
+            <% else %>    
+              <% from_user = User.find_by({ "id" => transaction["from_user_id"] }) %>
+              <%= from_user["name"] %> 
+              <% end %>
+      </td>
+      <td><%= to_user["name"] %> </td>
+      <td><%= transaction["amount"] %> </td>
+    </tr>
+  <% end %>
+</table>
+
 <!-- Step 2: Calculate and display the balances -->
 
-<h1>Balances</h1>
+<h2>Balances - List Version</h2>
 
 <%
   users = User.all
@@ -41,11 +65,21 @@
     </li> 
   <% end %> 
 </ul>
-<!-- 
-Expected balances:
-Balance for Brian: 1348 KC
-Balance for Ben: 2516 KC
-Balance for Evan: 1164 KC
-Balance for Anthony: 1456 KC
-Balance for Krystina: 3516 KC 
--->
+
+<h2>Balances - Table Version</h2>
+
+
+<table>
+  <tr>
+    <th>User</th>
+    <th>Balance</th>
+  </tr>
+  <% for user in users %>
+    <% balance = Transaction.where({ "to_user_id" => user["id"] }).sum("amount") - 
+                 Transaction.where({ "from_user_id" => user["id"] }).sum("amount")  %>
+    <tr> 
+      <td><%= user["name"] %></td>
+      <td><%= balance %></td>
+    </tr> 
+  <% end %> 
+</table>
